@@ -7,17 +7,42 @@ import SignInAndSignOut from './pages/sign-in-and-sign-out/sign-in-and-sign-out.
 
 import {Switch,Route} from 'react-router-dom'
 
-function App() {
-  return (
-    <div>
-      <Header/>
-      <Switch>
-        <Route exact path='/' component = {HomePage} />
-        <Route exact path='/shop' component = {ShopPage} />
-        <Route exact path='/signin' component = {SignInAndSignOut} />
-      </Switch>
-    </div>
-  );
+import {auth} from './firebase/firebase.utils'
+
+class App extends React.Component {
+  constructor() {
+    super()
+
+    this.state = {
+      currentUser: null
+    }
+  }
+  unsuscribeFromAuth = null
+
+  componentDidMount() {
+    this.unsuscribeFromAuth = auth.onAuthStateChanged(user => {
+      this.setState({currentUser: user})
+    })
+  }
+
+  componentWillUnmount() {
+    this.unsuscribeFromAuth()
+  }
+
+  
+
+  render() {
+    return (
+      <div>
+        <Header currentUser={this.state.currentUser}/>
+        <Switch>
+          <Route exact path='/' component = {HomePage} />
+          <Route exact path='/shop' component = {ShopPage} />
+          <Route exact path='/signin' component = {SignInAndSignOut} />
+        </Switch>
+      </div>
+    );
+  }
 }
 
 export default App;
